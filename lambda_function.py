@@ -9,6 +9,7 @@ http://amzn.to/1LGWsLG
 
 from __future__ import print_function
 
+memoryList = []
 
 # --------------- Helpers that build all of the responses ----------------------
 
@@ -47,7 +48,7 @@ def get_welcome_response():
     """ If we wanted to initialize the session to have some attributes we could
     add those here
     """
-    
+   
     session_attributes = {}
     card_title = "Welcome"
     speech_output = "Welcome to the Alexa Memory Game. " 
@@ -85,10 +86,13 @@ def set_color_in_session(intent, session):
 
     if 'Word' in intent['slots']:
         favorite_color = intent['slots']['Word']['value']
+        memoryList.append(favorite_color)
         session_attributes = create_favorite_color_attributes(favorite_color)
         speech_output = "I now know your word is " + \
                         favorite_color + \
                         "."
+        for element in memoryList:
+            speech_output = speech_output + element
         reprompt_text = "You can ask me your favorite color by saying, " \
                         "what's my favorite color?"
     else:
