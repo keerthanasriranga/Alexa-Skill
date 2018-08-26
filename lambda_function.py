@@ -113,7 +113,9 @@ def set_color_in_session(intent, session):
                         "The list of words are "
         for element in memoryList:
             speech_output = speech_output + element + ","
-        speech_output = speech_output + " and " + countryList[random.randint(0,len(countryList)-1)]
+        alexa_word = countryList[random.randint(0,len(countryList)-1)]
+        speech_output = speech_output + " and " + alexa_word
+        memoryList.append(alexa_word)
         reprompt_text = "You can ask me your favorite color by saying, " \
                         "what's my favorite color?"
     else:
