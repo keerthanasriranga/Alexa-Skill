@@ -11,6 +11,23 @@ from __future__ import print_function
 
 memoryList = []
 
+countryList = ["Ecuador",
+"Guatemala",
+"Mali",
+"Cambodia",
+"Senegal",
+"Zambia",
+"Zimbabwe",
+"Chad",
+"South Sudan",
+"Belgium",
+"Cuba",
+"Tunisia",
+"Guinea",
+"Greece",
+"Portugal",
+]
+
 # --------------- Helpers that build all of the responses ----------------------
 
 def build_speechlet_response(title, output, reprompt_text, should_end_session):
@@ -91,7 +108,7 @@ def set_color_in_session(intent, session):
         speech_output = "I now know your word is " + \
                         favorite_color + \
                         ". " + \
-                        "the list of words are "
+                        "The list of words are "
         for element in memoryList:
             speech_output = speech_output + element + ","
         reprompt_text = "You can ask me your favorite color by saying, " \
