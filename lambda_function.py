@@ -9,6 +9,8 @@ http://amzn.to/1LGWsLG
 
 from __future__ import print_function
 
+import random
+
 memoryList = []
 
 countryList = ["Ecuador",
@@ -111,6 +113,7 @@ def set_color_in_session(intent, session):
                         "The list of words are "
         for element in memoryList:
             speech_output = speech_output + element + ","
+        speech_output = speech_output + " and " + countryList[random.randint(0,len(countryList)-1)]
         reprompt_text = "You can ask me your favorite color by saying, " \
                         "what's my favorite color?"
     else:
