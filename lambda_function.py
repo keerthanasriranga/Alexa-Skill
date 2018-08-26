@@ -90,9 +90,10 @@ def set_color_in_session(intent, session):
         session_attributes = create_favorite_color_attributes(favorite_color)
         speech_output = "I now know your word is " + \
                         favorite_color + \
-                        "."
+                        ". " + \
+                        "the list of words are "
         for element in memoryList:
-            speech_output = speech_output + element
+            speech_output = speech_output + element + ","
         reprompt_text = "You can ask me your favorite color by saying, " \
                         "what's my favorite color?"
     else:
