@@ -148,7 +148,14 @@ def get_color_from_session(intent, session):
     return build_response(session_attributes, build_speechlet_response(
         intent['name'], speech_output, reprompt_text, should_end_session))
 
-
+def get_list_prompt(intent, session):
+    session_attributes = {}
+    reprompt_text = None
+    speech_output = "Go on"
+    should_end_session = False
+    return build_response(session_attributes, build_speechlet_response(
+        intent['name'], speech_output, reprompt_text, should_end_session))
+    
 # --------------- Events ------------------
 
 def on_session_started(session_started_request, session):
@@ -181,6 +188,8 @@ def on_intent(intent_request, session):
     # Dispatch to your skill's intent handlers
     if intent_name == "MyWordIsIntent":
         return set_color_in_session(intent, session)
+    elif intent_name == "TheListIsIntent":
+        return get_list_prompt(intent, session)
     elif intent_name == "WhatsMyColorIntent":
         return set_color_in_session(intent, session)
     elif intent_name == "AMAZON.HelpIntent":
