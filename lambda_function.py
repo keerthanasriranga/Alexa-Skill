@@ -168,18 +168,22 @@ def check_this_word(intent, session):
     speech_output = ""
     should_end_session = False
     card_title = intent['name']
-    correct_word = checkQueue.get()
-    if 'Word' in intent['slots']:
+    if(checkQueue.empty()):
+        speech_output = speech_output + "You have said all the words correctly"
+        for element in memoryList:
+            checkQueue.put(element)
+    elif 'Word' in intent['slots']:
+        correct_word = checkQueue.get()
         current_word = intent['slots']['Word']['value']
+        if(current_word == correct_word):
+            speech_output = speech_output + "Correct, Go on. "
+        else:
+            speech_output = speech_output + "Incorrect. Game ended"
+            should_end_session = True
         if(checkQueue.empty()):
             speech_output = speech_output + "You have said all the words correctly"
             for element in memoryList:
                 checkQueue.put(element)
-        elif(current_word == correct_word):
-            speech_output = speech_output + "Correct, Word checked. "
-        else:
-            speech_output = speech_output + "Incorrect"
-            checkQueue.put(correct_word)
     else:
         speech_output = speech_output + "Word unchecked"
     return build_response(session_attributes, build_speechlet_response(
