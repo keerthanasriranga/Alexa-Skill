@@ -10,8 +10,12 @@ http://amzn.to/1LGWsLG
 from __future__ import print_function
 
 import random
+import Queue
 
 memoryList = []
+checkQueue = Queue.Queue(maxsize=20)
+
+
 
 countryList = ["Ecuador",
 "Guatemala",
@@ -106,6 +110,7 @@ def set_color_in_session(intent, session):
     if 'Word' in intent['slots']:
         favorite_color = intent['slots']['Word']['value']
         memoryList.append(favorite_color)
+        checkQueue.put(favorite_color)
         session_attributes = create_favorite_color_attributes(favorite_color)
         speech_output = "I now know your word is " + \
                         favorite_color + \
@@ -116,6 +121,7 @@ def set_color_in_session(intent, session):
         alexa_word = countryList[random.randint(0,len(countryList)-1)]
         speech_output = speech_output + " and " + alexa_word
         memoryList.append(alexa_word)
+        checkQueue.put(alexa_word)
         reprompt_text = "You can ask me your favorite color by saying, " \
                         "what's my favorite color?"
     else:
@@ -155,6 +161,29 @@ def get_list_prompt(intent, session):
     should_end_session = False
     return build_response(session_attributes, build_speechlet_response(
         intent['name'], speech_output, reprompt_text, should_end_session))
+        
+def check_this_word(intent, session):
+    session_attributes = {}
+    reprompt_text = None
+    speech_output = ""
+    should_end_session = False
+    card_title = intent['name']
+    correct_word = checkQueue.get()
+    if 'Word' in intent['slots']:
+        current_word = intent['slots']['Word']['value']
+        if(checkQueue.empty()):
+            speech_output = speech_output + "You have said all the words correctly"
+            for element in memoryList:
+                checkQueue.put(element)
+        elif(current_word == correct_word):
+            speech_output = speech_output + "Correct, Word checked. "
+        else:
+            speech_output = speech_output + "Incorrect"
+            checkQueue.put(correct_word)
+    else:
+        speech_output = speech_output + "Word unchecked"
+    return build_response(session_attributes, build_speechlet_response(
+        intent['name'], speech_output, reprompt_text, should_end_session))
     
 # --------------- Events ------------------
 
@@ -192,6 +221,8 @@ def on_intent(intent_request, session):
         return get_list_prompt(intent, session)
     elif intent_name == "WhatsMyColorIntent":
         return set_color_in_session(intent, session)
+    elif intent_name == "WordFromMemoryIntent":
+        return check_this_word(intent, session)
     elif intent_name == "AMAZON.HelpIntent":
         return get_welcome_response()
     elif intent_name == "AMAZON.CancelIntent" or intent_name == "AMAZON.StopIntent":
