@@ -77,8 +77,7 @@ def get_welcome_response():
     speech_output = "Welcome to the Alexa Memory Game. " 
     # If the user either does not reply to the welcome message or says something
     # that is not understood, they will be prompted again with this text.
-    reprompt_text = "Please tell me your favorite color by saying, " \
-                    "my favorite color is red."
+    reprompt_text = ""
     should_end_session = False
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
@@ -108,12 +107,12 @@ def set_color_in_session(intent, session):
     should_end_session = False
 
     if 'Word' in intent['slots']:
-        favorite_color = intent['slots']['Word']['value']
-        memoryList.append(favorite_color)
-        checkQueue.put(favorite_color)
-        session_attributes = create_favorite_color_attributes(favorite_color)
+        players_word = intent['slots']['Word']['value']
+        memoryList.append(players_word)
+        checkQueue.put(players_word)
+        session_attributes = create_favorite_color_attributes(players_word)
         speech_output = "I now know your word is " + \
-                        favorite_color + \
+                        players_word + \
                         ". " + \
                         "The list of words are "
         for element in memoryList:
@@ -122,37 +121,12 @@ def set_color_in_session(intent, session):
         speech_output = speech_output + " and " + alexa_word
         memoryList.append(alexa_word)
         checkQueue.put(alexa_word)
-        reprompt_text = "You can ask me your favorite color by saying, " \
-                        "what's my favorite color?"
+        reprompt_text = None
     else:
-        speech_output = "I'm not sure what your favorite color is. " \
-                        "Please try again. In set color session"
-        reprompt_text = "I'm not sure what your favorite color is. " \
-                        "You can tell me your favorite color by saying, " \
-                        "my favorite color is red.In set color session"
+        speech_output = "Error"
+        reprompt_text = None
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
-
-
-def get_color_from_session(intent, session):
-    session_attributes = {}
-    reprompt_text = None
-
-    if session.get('attributes', {}) and "favoriteColor" in session.get('attributes', {}):
-        favorite_color = session['attributes']['favoriteColor']
-        speech_output = "Your favorite color is " + favorite_color + \
-                        ". Goodbye."
-        should_end_session = True
-    else:
-        speech_output = "I'm not sure what your favorite color is. " \
-                        "You can say, my favorite color is red.In get color"
-        should_end_session = False
-
-    # Setting reprompt_text to None signifies that we do not want to reprompt
-    # the user. If the user does not respond or says something that is not
-    # understood, the session will end.
-    return build_response(session_attributes, build_speechlet_response(
-        intent['name'], speech_output, reprompt_text, should_end_session))
 
 def get_list_prompt(intent, session):
     session_attributes = {}
@@ -223,8 +197,6 @@ def on_intent(intent_request, session):
         return set_color_in_session(intent, session)
     elif intent_name == "TheListIsIntent":
         return get_list_prompt(intent, session)
-    elif intent_name == "WhatsMyColorIntent":
-        return set_color_in_session(intent, session)
     elif intent_name == "WordFromMemoryIntent":
         return check_this_word(intent, session)
     elif intent_name == "AMAZON.HelpIntent":
